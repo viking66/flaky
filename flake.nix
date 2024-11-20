@@ -9,7 +9,7 @@
     hackagedoc.url = "path:./flakes/hackagedoc";
   };
 
-  outputs = { self, nixpkgs, flake-utils, hackagedoc, ... }:
+  outputs = { self, nixpkgs, flake-utils, hackagedoc }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -20,15 +20,16 @@
           
           default = pkgs.symlinkJoin {
             name = "flaky";
-            paths = with self.packages.${system}; [
-              hackagedoc
+            paths = [
+              self.packages.${system}.hackagedoc
             ];
           };
         };
 
         devShells.default = pkgs.mkShell {
-          buildInputs = with self.packages.${system}; [
-            hackagedoc
+          packages = [
+            self.packages.${system}.hackagedoc
+            pkgs.git
           ];
           
           shellHook = ''
